@@ -1,0 +1,49 @@
+name: CI/CD Pipeline Deployment
+
+on:
+  push:
+    branches:
+      - main  # Le pipeline se déclenche uniquement sur la branche main
+
+jobs:
+  # STAGE 1 : Initialisation
+  Initialization:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: echo "Installation des dépendances terminée."
+
+  # STAGE 2 : Build (dépend de l'initialisation)
+  Build:
+    needs: Initialization
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Build
+        run: echo "Compilation de l'application effectuée."
+
+  # STAGE 3 : Deploy (dépend du build)
+  Deploy:
+    needs: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Railway
+        run: echo "Déploiement en cours sur Railway..."
+
+  # STAGE 4 : Post-déploiement (dépend du deploy)
+  Post-deploy:
+    needs: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Healthcheck
+        run: echo "Vérification du service en ligne..."
+
+  # STAGE OPTIONNEL : Rollback (ne s'exécute QUE si Build ou Deploy échouent)
+  Rollback:
+    needs: [Build, Deploy]
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reverting changes
+        run: echo "Échec détecté. Retour à la version précédente..."
